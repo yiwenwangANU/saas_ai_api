@@ -1,0 +1,34 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import mongoose from "mongoose";
+
+import authRoutes from "./routes/authRoutes.js";
+const app = express();
+
+app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET, POST, PUT, PATCH, DELETE",
+    allowedHeaders: "Content-Type, Authorization",
+  })
+);
+
+app.get("/health", (req, res) => {
+  res.sendStatus(200); // returns HTTP 200 OK
+});
+
+app.use(authRoutes);
+
+mongoose
+  .connect(process.env.MONGOOSE_CONNECTION_STRING)
+  .then((result) =>
+    app.listen(8080, "0.0.0.0", () => {
+      console.log("Server running on port 8080");
+    })
+  )
+  .catch((err) => console.log(err));
