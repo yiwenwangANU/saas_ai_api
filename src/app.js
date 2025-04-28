@@ -7,6 +7,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 
 import authRoutes from "./routes/authRoutes.js";
+import pageRoute from "./routes/pageRoutes.js";
+import "./middlewares/passport.js";
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -23,7 +26,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use(authRoutes);
-
+app.use(pageRoute);
 mongoose
   .connect(process.env.MONGOOSE_CONNECTION_STRING)
   .then((result) =>
