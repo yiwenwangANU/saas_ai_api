@@ -30,9 +30,9 @@ const validateSignup = [
 
 const router = express.Router();
 
-router.post("/signup", validateSignup, authController.signup);
+router.post("/auth/signup", validateSignup, authController.signup);
 
-router.get("/login", authController.login);
+router.get("/auth/login", authController.login);
 
 // Google OAuth start
 router.get(
