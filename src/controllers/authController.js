@@ -1,8 +1,10 @@
 import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import User from "../models/User.js";
 
 export const signup = async (req, res, next) => {
+  console.log("User model loaded:", User);
   try {
     // in case of validate failed
     const errors = validationResult(req);

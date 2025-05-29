@@ -4,6 +4,7 @@ import authController, {
 } from "../controllers/authController.js";
 import { body } from "express-validator";
 import passport from "passport";
+import User from "../models/User.js";
 
 const validateSignup = [
   body("email")

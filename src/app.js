@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import pageRoute from "./routes/pageRoutes.js";
 import "./middlewares/passport.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.get("/health", (req, res) => {
 
 app.use(authRoutes);
 app.use(pageRoute);
+app.use(errorHandler);
 mongoose
   .connect(process.env.MONGOOSE_CONNECTION_STRING)
   .then((result) =>
