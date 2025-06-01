@@ -97,7 +97,7 @@ export const googleAuthRedirect = (req, res) => {
     {
       userId: req.user._id.toString(),
       email: req.user.email,
-      usename: req.user.name,
+      name: req.user.name,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
