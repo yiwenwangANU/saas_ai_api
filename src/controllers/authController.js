@@ -94,12 +94,21 @@ export const login = async (req, res, next) => {
 export const googleAuthRedirect = (req, res) => {
   // Generate a JWT.
   const token = jwt.sign(
-    { userId: req.user._id.toString(), email: req.user.email },
+    {
+      userId: req.user._id.toString(),
+      email: req.user.email,
+      usename: req.user.name,
+    },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
-
-  res.json({ token });
+  const clientUrl = process.env.CLIENT_URL;
+  res.send(`
+    <script>
+      window.opener.postMessage({ token: "${token}" }, "${clientUrl}");
+      window.close();
+    </script>
+  `);
 };
 
 export default {

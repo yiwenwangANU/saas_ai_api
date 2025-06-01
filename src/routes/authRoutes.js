@@ -38,7 +38,10 @@ router.get("/auth/login", authController.login);
 // Google OAuth start
 router.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+  })
 );
 
 // Google OAuth callback
