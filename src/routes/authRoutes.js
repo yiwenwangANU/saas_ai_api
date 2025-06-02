@@ -13,6 +13,11 @@ const validateSignup = [
     .custom(async (value) => {
       const existingUser = await User.findOne({ email: value });
       if (existingUser) {
+        if (!existingUser.password) {
+          return Promise.reject(
+            "This email is registered via Google. Please log in using Google."
+          );
+        }
         return Promise.reject("Email already been used.");
       }
       return true;
