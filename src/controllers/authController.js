@@ -50,7 +50,7 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     // get email and password from req
-    const email = req.body.email.toLowerCase();
+    const email = req.body.email.trim().toLowerCase();
     const password = req.body.password;
 
     // check if there is any user using that email
