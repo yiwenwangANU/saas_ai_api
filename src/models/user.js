@@ -18,6 +18,20 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    subscriptionActive: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    subscriptionTier: {
+      type: String,
+      require: false,
+    },
+    stripeScriptionId: {
+      type: String,
+      require: false,
+      unique: true,
+    },
   },
   {
     timestamps: { createdAt: true, updatedAt: true },
