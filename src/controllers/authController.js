@@ -4,9 +4,8 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 
 export const signup = async (req, res, next) => {
-  console.log("User model loaded:", User);
   try {
-    // in case of validate failed
+    // 1. Validate inputs
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       // Get error message from validator
@@ -22,25 +21,30 @@ export const signup = async (req, res, next) => {
       return next(error);
     }
 
-    // create post object from req
+    // 2. Get data from req body
     const email = req.body.email.trim().toLowerCase();
     const password = req.body.password;
-    // Hash the password with bcrypt
+    const name = req.body.name;
+
+    // 3. Hash the password with bcrypt
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const name = req.body.name;
-
-    const user = new User({
+    // 4. Create and save user
+    const newUser = await User.create({
       email: email,
       password: hashedPassword,
       name: name,
     });
-    // insert object into mongodb
-    const result = await user.save();
+
+    // 5. Return response (exclude password)
     res.status(201).json({
       message: "User created successfully!",
-      user: result,
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        name: newUser.name,
+      },
     });
   } catch (err) {
     next(err);
