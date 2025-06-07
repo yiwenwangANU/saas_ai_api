@@ -23,7 +23,7 @@ export const signup = async (req, res, next) => {
     }
 
     // create post object from req
-    const email = req.body.email.toLowerCase();
+    const email = req.body.email.trim().toLowerCase();
     const password = req.body.password;
     // Hash the password with bcrypt
     const saltRounds = 10;

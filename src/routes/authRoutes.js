@@ -8,6 +8,8 @@ import User from "../models/User.js";
 
 const validateSignup = [
   body("email")
+    .trim()
+    .toLowerCase()
     .isEmail()
     .withMessage("Please enter a valid email.")
     .custom(async (value) => {
@@ -27,11 +29,7 @@ const validateSignup = [
     .trim()
     .isLength({ min: 5 })
     .withMessage("Please enter a valid password."),
-  body("name")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Please enter a valid user name."),
+  body("name").trim().notEmpty().withMessage("Please enter a valid user name."),
 ];
 
 const router = express.Router();
