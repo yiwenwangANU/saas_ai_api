@@ -53,38 +53,38 @@ export const signup = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    // get email and password from req
+    // 1. Get data from req body
     const email = req.body.email.trim().toLowerCase();
     const password = req.body.password;
 
-    // check if there is any user using that email
+    // 2. Check if email exist
     const user = await User.findOne({ email: email });
+    const authError = new Error("Email or password is incorrect.");
+
+    authError.statusCode = 401;
     if (!user) {
-      const error = new Error("Email or password is wrong.");
-      error.statusCode = 401;
-      return next(error);
-    }
-    // check if user was from oauth
-    if (!user.password) {
-      const error = new Error("Email or password is wrong.");
-      error.statusCode = 401;
-      return next(error);
-    }
-    // check if the password match
-    const isAuth = await bcrypt.compare(password, user.password);
-    if (!isAuth) {
-      const error = new Error("Email or password is wrong.");
-      error.statusCode = 401;
-      return next(error);
+      return next(authError);
     }
 
-    // Generate a JWT.
+    // 3. Check if password is empty(user from oauth)
+    if (!user.password) {
+      return next(authError);
+    }
+
+    // 4. Check if the password match
+    const isAuth = await bcrypt.compare(password, user.password);
+    if (!isAuth) {
+      return next(authError);
+    }
+
+    // 5. Generate a JWT.
     const token = jwt.sign(
       { userId: user._id.toString(), email: user.email, name: user.name },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
+    // 6. Send response
     res.status(201).json({
       message: "User login successfully!",
       token: token,
