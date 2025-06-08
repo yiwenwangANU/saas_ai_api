@@ -96,6 +96,7 @@ export const login = async (req, res, next) => {
 };
 
 export const googleAuthRedirect = (req, res) => {
+  // After Google Oauth success, req.user will be a user object
   // Generate a JWT.
   const token = jwt.sign(
     {
@@ -107,9 +108,11 @@ export const googleAuthRedirect = (req, res) => {
     { expiresIn: "1h" }
   );
   const clientUrl = process.env.CLIENT_URL;
+
+  // send message to opener(main app window) to tranfer data between windows
   res.send(`
     <script>
-      window.opener.postMessage({ token: "${token}" }, "${clientUrl}");
+      window.opener.postMessage({ token: "${token}", message: "Welcome, ${req.user.name}", name: "${req.user.name}" }, "${clientUrl}");
       window.close();
     </script>
   `);
