@@ -5,17 +5,20 @@ import dotenv from "dotenv";
 import User from "../models/User.js";
 dotenv.config();
 
+// Passport jwt strategy
+// https://www.passportjs.org/packages/passport-jwt/
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET,
 };
 
 passport.use(
-  new JwtStrategy(options, (jwt_payload, done) => {
+  new JwtStrategy(options, async (jwt_payload, done) => {
     try {
       // Normally you would look up user from DB here
-      const user = { id: jwt_payload.id, email: jwt_payload.email };
-      return done(null, user);
+      const user = await User.findById(jwt_payload.userId);
+      if (!user) return done(null, false);
+      else return done(null, user);
     } catch (err) {
       return done(err, false);
     }
