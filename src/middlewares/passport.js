@@ -25,7 +25,8 @@ passport.use(
   })
 );
 
-// Google OAuth Strategy
+// Passport Google OAuth Strategy
+// https://www.passportjs.org/packages/passport-google-oauth20/
 passport.use(
   new GoogleStrategy(
     {

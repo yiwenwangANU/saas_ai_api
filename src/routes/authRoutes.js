@@ -38,12 +38,13 @@ router.post("/auth/signup", validateSignup, authController.signup);
 
 router.post("/auth/login", authController.login);
 
-// Google OAuth start
+// Google OAuth routes
+// https://www.passportjs.org/packages/passport-google-oauth20/
 router.get(
   "/auth/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    prompt: "select_account",
+    prompt: "select_account", // force prompt window show account selection
   })
 );
 
