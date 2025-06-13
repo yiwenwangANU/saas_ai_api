@@ -30,7 +30,7 @@ app.get("/health", (req, res) => {
 
 app.use(authRoutes);
 app.use(pageRoute);
-app.use(stripeRoute);
+app.use("/api/stripe", stripeRoute);
 
 app.use(errorHandler);
 mongoose

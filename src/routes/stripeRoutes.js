@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import Stripe from "stripe";
 
@@ -38,7 +41,8 @@ router.post(
     // If you are testing with the CLI, find the secret by running 'stripe listen'
     // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
     // at https://dashboard.stripe.com/webhooks
-    const endpointSecret = "whsec_12345";
+    const endpointSecret =
+      "whsec_88ac6c6e63b1c1fcf58ce75b19d009fa2177238be4c626c63a5c559ed01a8256";
     // Only verify the event if you have an endpoint secret defined.
     // Otherwise use the basic event deserialized with JSON.parse
     if (endpointSecret) {
