@@ -37,10 +37,6 @@ router.post(
   express.raw({ type: "application/json" }),
   (request, response) => {
     let event = request.body;
-    // Replace this endpoint secret with your endpoint's unique secret
-    // If you are testing with the CLI, find the secret by running 'stripe listen'
-    // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-    // at https://dashboard.stripe.com/webhooks
     const endpointSecret =
       "whsec_88ac6c6e63b1c1fcf58ce75b19d009fa2177238be4c626c63a5c559ed01a8256";
     // Only verify the event if you have an endpoint secret defined.
@@ -63,6 +59,13 @@ router.post(
     let status;
     // Handle the event
     switch (event.type) {
+      case "checkout.session.completed":
+        subscription = event.data.object;
+        status = subscription.status;
+        console.log(`Subscription status is ${status}.`);
+        // Then define and call a method to handle the subscription trial ending.
+        // handleSubscriptionTrialEnding(subscription);
+        break;
       case "customer.subscription.trial_will_end":
         subscription = event.data.object;
         status = subscription.status;

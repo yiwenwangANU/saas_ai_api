@@ -15,7 +15,14 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
-app.use(bodyParser.json());
+// conditionally parse stripe webhook
+app.use((req, res, next) => {
+  if (req.path === "/api/stripe/webhook") {
+    return next(); // leave the raw body intact
+  }
+  bodyParser.json()(req, res, next); // parse JSON elsewhere
+});
+
 app.use(
   cors({
     origin: "*",
