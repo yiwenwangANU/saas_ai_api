@@ -25,7 +25,7 @@ router.post("/create-checkout-session", async (req, res) => {
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
 
-    res.json({ url: session.url });
+    res.json({ sessionId: session.id });
   } catch (err) {
     console.error("Stripe session error:", err);
     res.status(500).json({ error: "Stripe error" });
