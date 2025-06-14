@@ -37,8 +37,7 @@ router.post(
   express.raw({ type: "application/json" }),
   (request, response) => {
     let event = request.body;
-    const endpointSecret =
-      "whsec_88ac6c6e63b1c1fcf58ce75b19d009fa2177238be4c626c63a5c559ed01a8256";
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
     // Only verify the event if you have an endpoint secret defined.
     // Otherwise use the basic event deserialized with JSON.parse
     if (endpointSecret) {
@@ -62,41 +61,47 @@ router.post(
       case "checkout.session.completed":
         subscription = event.data.object;
         status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
+        console.log(`1. Subscription status is ${status}.`);
+        console.log(subscription);
         // Then define and call a method to handle the subscription trial ending.
         // handleSubscriptionTrialEnding(subscription);
-        break;
-      case "customer.subscription.trial_will_end":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription trial ending.
-        // handleSubscriptionTrialEnding(subscription);
-        break;
-      case "customer.subscription.deleted":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription deleted.
-        // handleSubscriptionDeleted(subscriptionDeleted);
         break;
       case "customer.subscription.created":
         subscription = event.data.object;
         status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription created.
-        // handleSubscriptionCreated(subscription);
+        console.log(`2. Subscription status is ${status}.`);
+        console.log(subscription);
+        // Then define and call a method to handle the subscription trial ending.
+        // handleSubscriptionTrialEnding(subscription);
         break;
       case "customer.subscription.updated":
         subscription = event.data.object;
         status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription update.
-        // handleSubscriptionUpdated(subscription);
+        console.log(
+          `3. Subscription status is ${status}. subscription: ${subscription}`
+        );
+        // Then define and call a method to handle the subscription deleted.
+        // handleSubscriptionDeleted(subscriptionDeleted);
         break;
-      case "entitlements.active_entitlement_summary.updated":
+      case "customer.subscription.deleted":
         subscription = event.data.object;
-        console.log(`Active entitlement summary updated for ${subscription}.`);
+        status = subscription.status;
+        console.log(
+          `4. Subscription status is ${status}. subscription: ${subscription}`
+        );
+        // Then define and call a method to handle the subscription created.
+        // handleSubscriptionCreated(subscription);
+        break;
+      case "invoice.payment_succeeded":
+        subscription = event.data.object;
+        console.log(`5. subscription:`);
+        console.log(subscription);
+        // Then define and call a method to handle active entitlement summary updated
+        // handleEntitlementUpdated(subscription);
+        break;
+      case "invoice.payment_failed":
+        subscription = event.data.object;
+        console.log(`6. subscription: ${subscription}`);
         // Then define and call a method to handle active entitlement summary updated
         // handleEntitlementUpdated(subscription);
         break;

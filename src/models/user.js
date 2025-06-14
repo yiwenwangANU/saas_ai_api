@@ -27,7 +27,7 @@ const userSchema = new Schema(
       type: String,
       require: false,
     },
-    stripeScriptionId: {
+    stripeSubscriptionId: {
       type: String,
       require: false,
       unique: true,
