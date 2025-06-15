@@ -35,7 +35,7 @@ router.post("/create-checkout-session", async (req, res) => {
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
-  (request, response) => {
+  async (request, response) => {
     let event = request.body;
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
     // Only verify the event if you have an endpoint secret defined.
@@ -61,8 +61,13 @@ router.post(
       case "checkout.session.completed":
         subscription = event.data.object;
         status = subscription.status;
+        const email = subscription.customer_email;
         console.log(`1. Subscription status is ${status}.`);
         console.log(subscription);
+        await User.findOneAndUpdate(
+          { email },
+          { stripeScriptionId: subscription.id }
+        );
         // Then define and call a method to handle the subscription trial ending.
         // handleSubscriptionTrialEnding(subscription);
         break;
