@@ -55,55 +55,51 @@ router.post(
         return response.sendStatus(400);
       }
     }
-    let subscription;
-    let status;
+    let session;
     // Handle the event
     switch (event.type) {
       case "checkout.session.completed":
-        subscription = event.data.object;
-        const email = subscription.customer_email;
-        await User.findOneAndUpdate(
-          { email },
-          { $set: { stripeSubscriptionId: subscription.id } }
-        );
-
-        console.log("case fire: checkout.session.completed");
-        console.log(`with email: ${email}`);
+        console.log(`1.checkout.session.completed`);
         // Then define and call a method to handle the subscription trial ending.
         // handleSubscriptionTrialEnding(subscription);
         break;
       case "customer.subscription.created":
-        subscription = event.data.object;
-        await User.findOneAndUpdate(
-          { stripeSubscriptionId: subscription.id },
+        session = event.data.object;
+        const customer = await stripe.customers.retrieve(session.customer);
+        const currentUser = await User.findOneAndUpdate(
+          { email: customer.email },
           {
-            subscriptionActive:
-              subscription.status === "active" ||
-              subscription.status === "trialing",
-            subscriptionTier: subscription.items.data[0].price.nickname,
+            $set: {
+              stripeSubscriptionId: session.id,
+              subscriptionActive:
+                session.status === "active" || session.status === "trialing",
+              subscriptionTier: session.items.data[0].plan.interval,
+            },
           }
         );
+        console.log("case fire 2:");
+        console.log(customer);
+        console.log(currentUser);
         // Then define and call a method to handle the subscription trial ending.
         // handleSubscriptionTrialEnding(subscription);
         break;
       case "customer.subscription.updated":
-        subscription = event.data.object;
+        session = event.data.object;
         await User.findOneAndUpdate(
-          { stripeSubscriptionId: subscription.id },
+          { stripeSubscriptionId: session.id },
           {
             subscriptionActive:
-              subscription.status === "active" ||
-              subscription.status === "trialing",
-            subscriptionTier: subscription.items.data[0].price.nickname,
+              session.status === "active" || session.status === "trialing",
+            subscriptionTier: session.items.data[0].price.nickname,
           }
         );
         // Then define and call a method to handle the subscription deleted.
         // handleSubscriptionDeleted(subscriptionDeleted);
         break;
       case "customer.subscription.deleted":
-        subscription = event.data.object;
+        session = event.data.object;
         await User.findOneAndUpdate(
-          { stripeSubscriptionId: subscription.id },
+          { stripeSubscriptionId: session.id },
           {
             subscriptionActive: false,
             subscriptionTier: null,
@@ -113,14 +109,14 @@ router.post(
         // handleSubscriptionCreated(subscription);
         break;
       case "invoice.payment_succeeded":
-        subscription = event.data.object;
+        session = event.data.object;
         // console.log(`5. subscription:`);
         // console.log(subscription);
         // Then define and call a method to handle active entitlement summary updated
         // handleEntitlementUpdated(subscription);
         break;
       case "invoice.payment_failed":
-        subscription = event.data.object;
+        session = event.data.object;
         // console.log(`6. subscription: ${subscription}`);
         // Then define and call a method to handle active entitlement summary updated
         // handleEntitlementUpdated(subscription);
