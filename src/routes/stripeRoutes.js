@@ -60,10 +60,7 @@ router.post(
     switch (event.type) {
       case "checkout.session.completed":
         subscription = event.data.object;
-        status = subscription.status;
         const email = subscription.customer_email;
-        console.log(`1. Subscription status is ${status}.`);
-        console.log(subscription);
         await User.findOneAndUpdate(
           { email },
           { stripeScriptionId: subscription.id }
@@ -73,26 +70,40 @@ router.post(
         break;
       case "customer.subscription.created":
         subscription = event.data.object;
-        status = subscription.status;
-        console.log(`2. Subscription status is ${status}.`);
-        console.log(subscription);
+        await User.findOneAndUpdate(
+          { stripeScriptionId: subscription.id },
+          {
+            subscriptionActive:
+              subscription.status === "active" ||
+              subscription.status === "trialing",
+            subscriptionTier: subscription.items.data[0].price.nickname,
+          }
+        );
         // Then define and call a method to handle the subscription trial ending.
         // handleSubscriptionTrialEnding(subscription);
         break;
       case "customer.subscription.updated":
         subscription = event.data.object;
-        status = subscription.status;
-        console.log(
-          `3. Subscription status is ${status}. subscription: ${subscription}`
+        await User.findOneAndUpdate(
+          { stripeScriptionId: subscription.id },
+          {
+            subscriptionActive:
+              subscription.status === "active" ||
+              subscription.status === "trialing",
+            subscriptionTier: subscription.items.data[0].price.nickname,
+          }
         );
         // Then define and call a method to handle the subscription deleted.
         // handleSubscriptionDeleted(subscriptionDeleted);
         break;
       case "customer.subscription.deleted":
         subscription = event.data.object;
-        status = subscription.status;
-        console.log(
-          `4. Subscription status is ${status}. subscription: ${subscription}`
+        await User.findOneAndUpdate(
+          { stripeScriptionId: subscription.id },
+          {
+            subscriptionActive: false,
+            subscriptionTier: null,
+          }
         );
         // Then define and call a method to handle the subscription created.
         // handleSubscriptionCreated(subscription);
