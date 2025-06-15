@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from "express";
 import Stripe from "stripe";
+import User from "../models/User.js";
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -63,15 +64,18 @@ router.post(
         const email = subscription.customer_email;
         await User.findOneAndUpdate(
           { email },
-          { stripeScriptionId: subscription.id }
+          { $set: { stripeSubscriptionId: subscription.id } }
         );
+
+        console.log("case fire: checkout.session.completed");
+        console.log(`with email: ${email}`);
         // Then define and call a method to handle the subscription trial ending.
         // handleSubscriptionTrialEnding(subscription);
         break;
       case "customer.subscription.created":
         subscription = event.data.object;
         await User.findOneAndUpdate(
-          { stripeScriptionId: subscription.id },
+          { stripeSubscriptionId: subscription.id },
           {
             subscriptionActive:
               subscription.status === "active" ||
@@ -85,7 +89,7 @@ router.post(
       case "customer.subscription.updated":
         subscription = event.data.object;
         await User.findOneAndUpdate(
-          { stripeScriptionId: subscription.id },
+          { stripeSubscriptionId: subscription.id },
           {
             subscriptionActive:
               subscription.status === "active" ||
@@ -99,7 +103,7 @@ router.post(
       case "customer.subscription.deleted":
         subscription = event.data.object;
         await User.findOneAndUpdate(
-          { stripeScriptionId: subscription.id },
+          { stripeSubscriptionId: subscription.id },
           {
             subscriptionActive: false,
             subscriptionTier: null,
@@ -110,14 +114,14 @@ router.post(
         break;
       case "invoice.payment_succeeded":
         subscription = event.data.object;
-        console.log(`5. subscription:`);
-        console.log(subscription);
+        // console.log(`5. subscription:`);
+        // console.log(subscription);
         // Then define and call a method to handle active entitlement summary updated
         // handleEntitlementUpdated(subscription);
         break;
       case "invoice.payment_failed":
         subscription = event.data.object;
-        console.log(`6. subscription: ${subscription}`);
+        // console.log(`6. subscription: ${subscription}`);
         // Then define and call a method to handle active entitlement summary updated
         // handleEntitlementUpdated(subscription);
         break;
