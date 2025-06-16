@@ -12,6 +12,7 @@ router.post("/create-checkout-session", checkAuth, stripeCheckoutSession);
 
 router.post(
   "/webhook",
+  checkAuth,
   express.raw({ type: "application/json" }),
   stripeWebhooks
 );
