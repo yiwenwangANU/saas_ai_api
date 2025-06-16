@@ -59,7 +59,7 @@ router.post(
       }
     }
     let session;
-    // Handle the event
+    // Handle the event, events may have race conditions
     try {
       switch (event.type) {
         case "checkout.session.completed":
