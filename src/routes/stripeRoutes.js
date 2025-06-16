@@ -57,76 +57,82 @@ router.post(
     }
     let session;
     // Handle the event
-    switch (event.type) {
-      case "checkout.session.completed":
-        console.log(`1.checkout.session.completed`);
-        // Then define and call a method to handle the subscription trial ending.
-        // handleSubscriptionTrialEnding(subscription);
-        break;
-      case "customer.subscription.created":
-        session = event.data.object;
-        const customer = await stripe.customers.retrieve(session.customer);
-        const currentUser = await User.findOneAndUpdate(
-          { email: customer.email },
-          {
-            $set: {
+    try {
+      switch (event.type) {
+        case "checkout.session.completed":
+          console.log(`1.checkout.session.completed`);
+          // Then define and call a method to handle the subscription trial ending.
+          // handleSubscriptionTrialEnding(subscription);
+          break;
+        case "customer.subscription.created":
+          session = event.data.object;
+          const customer = await stripe.customers.retrieve(session.customer);
+          await User.findOneAndUpdate(
+            { email: customer.email },
+            {
               stripeSubscriptionId: session.id,
               subscriptionActive:
                 session.status === "active" || session.status === "trialing",
               subscriptionTier: session.items.data[0].plan.interval,
-            },
-          }
-        );
-        console.log("case fire 2:");
-        console.log(customer);
-        console.log(currentUser);
-        // Then define and call a method to handle the subscription trial ending.
-        // handleSubscriptionTrialEnding(subscription);
-        break;
-      case "customer.subscription.updated":
-        session = event.data.object;
-        await User.findOneAndUpdate(
-          { stripeSubscriptionId: session.id },
-          {
-            subscriptionActive:
-              session.status === "active" || session.status === "trialing",
-            subscriptionTier: session.items.data[0].price.nickname,
-          }
-        );
-        // Then define and call a method to handle the subscription deleted.
-        // handleSubscriptionDeleted(subscriptionDeleted);
-        break;
-      case "customer.subscription.deleted":
-        session = event.data.object;
-        await User.findOneAndUpdate(
-          { stripeSubscriptionId: session.id },
-          {
-            subscriptionActive: false,
-            subscriptionTier: null,
-          }
-        );
-        // Then define and call a method to handle the subscription created.
-        // handleSubscriptionCreated(subscription);
-        break;
-      case "invoice.payment_succeeded":
-        session = event.data.object;
-        // console.log(`5. subscription:`);
-        // console.log(subscription);
-        // Then define and call a method to handle active entitlement summary updated
-        // handleEntitlementUpdated(subscription);
-        break;
-      case "invoice.payment_failed":
-        session = event.data.object;
-        // console.log(`6. subscription: ${subscription}`);
-        // Then define and call a method to handle active entitlement summary updated
-        // handleEntitlementUpdated(subscription);
-        break;
-      default:
-        // Unexpected event type
-        console.log(`Unhandled event type ${event.type}.`);
+            }
+          );
+          // Then define and call a method to handle the subscription trial ending.
+          // handleSubscriptionTrialEnding(subscription);
+          break;
+        case "customer.subscription.updated":
+          session = event.data.object;
+          await User.findOneAndUpdate(
+            { stripeSubscriptionId: session.id },
+            {
+              subscriptionActive:
+                session.status === "active" || session.status === "trialing",
+              subscriptionTier: session.items.data[0].plan.interval,
+            }
+          );
+          // Then define and call a method to handle the subscription deleted.
+          // handleSubscriptionDeleted(subscriptionDeleted);
+          break;
+        case "customer.subscription.deleted":
+          session = event.data.object;
+          await User.findOneAndUpdate(
+            { stripeSubscriptionId: session.id },
+            {
+              stripeSubscriptionId: null,
+              subscriptionActive: false,
+              subscriptionTier: null,
+            }
+          );
+          // Then define and call a method to handle the subscription created.
+          // handleSubscriptionCreated(subscription);
+          break;
+        case "invoice.payment_succeeded":
+          session = event.data.object.subscription;
+          // console.log(`5. subscription:`);
+          // console.log(subscription);
+          // Then define and call a method to handle active entitlement summary updated
+          // handleEntitlementUpdated(subscription);
+          break;
+        case "invoice.payment_failed":
+          session = event.data.object.subscription;
+          await User.findOneAndUpdate(
+            { stripeSubscriptionId: session.id },
+            {
+              subscriptionActive: false,
+            }
+          );
+          // console.log(`6. subscription: ${subscription}`);
+          // Then define and call a method to handle active entitlement summary updated
+          // handleEntitlementUpdated(subscription);
+          break;
+        default:
+          // Unexpected event type
+          console.log(`Unhandled event type ${event.type}.`);
+      }
+      // Return a 200 response to acknowledge receipt of the event
+      response.send();
+    } catch (error) {
+      next(error);
     }
-    // Return a 200 response to acknowledge receipt of the event
-    response.send();
   }
 );
 export default router;
