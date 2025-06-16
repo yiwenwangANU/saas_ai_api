@@ -22,6 +22,9 @@ router.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
+      subscription_data: {
+        metadata: { email }, // parse the metadata in the session
+      },
       success_url: `${process.env.CLIENT_URL}/subscribe_success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
@@ -66,9 +69,9 @@ router.post(
           break;
         case "customer.subscription.created":
           session = event.data.object;
-          const customer = await stripe.customers.retrieve(session.customer);
+          const email = session.metadata.email;
           await User.findOneAndUpdate(
-            { email: customer.email },
+            { email: email },
             {
               stripeSubscriptionId: session.id,
               subscriptionActive:
@@ -76,6 +79,7 @@ router.post(
               subscriptionTier: session.items.data[0].plan.interval,
             }
           );
+          console.log(session);
           // Then define and call a method to handle the subscription trial ending.
           // handleSubscriptionTrialEnding(subscription);
           break;
