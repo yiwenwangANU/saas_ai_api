@@ -15,14 +15,6 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
-// conditionally parse stripe webhook
-app.use((req, res, next) => {
-  if (req.path === "/api/stripe/webhook") {
-    return next(); // leave the raw body intact
-  }
-  bodyParser.json()(req, res, next); // parse JSON elsewhere
-});
-
 app.use(
   cors({
     origin: "*",
@@ -30,6 +22,14 @@ app.use(
     allowedHeaders: "Content-Type, Authorization",
   })
 );
+
+// conditionally parse stripe webhook
+app.use((req, res, next) => {
+  if (req.path === "/api/stripe/webhook") {
+    return next(); // leave the raw body intact
+  }
+  bodyParser.json()(req, res, next); // parse JSON elsewhere
+});
 
 app.get("/health", (req, res) => {
   res.sendStatus(200); // returns HTTP 200 OK

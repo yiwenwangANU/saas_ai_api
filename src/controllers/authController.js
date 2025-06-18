@@ -118,8 +118,24 @@ export const googleAuthRedirect = (req, res) => {
   `);
 };
 
+export const checkSubscription = async (req, res, next) => {
+  const userId = req.userId;
+
+  try {
+    // 4. Create and save user
+    const user = await User.findById(userId);
+    console.log(user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json({ subscriptionActive: user.subscriptionActive });
+  } catch (err) {
+    next(err);
+  }
+};
 export default {
   signup,
   login,
   googleAuthRedirect,
+  checkSubscription,
 };

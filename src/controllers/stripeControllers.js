@@ -23,7 +23,7 @@ export const stripeCheckoutSession = async (req, res) => {
       subscription_data: {
         metadata: { email }, // parse the metadata in the session
       },
-      success_url: `${process.env.CLIENT_URL}/subscribe_success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.CLIENT_URL}/subscribeSuccess?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
 
