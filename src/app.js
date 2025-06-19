@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import pageRoute from "./routes/pageRoutes.js";
 import stripeRoute from "./routes/stripeRoutes.js";
+import openaiRoute from "./routes/openaiRoutes.js";
 
 import "./middlewares/passport.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
@@ -37,6 +38,7 @@ app.get("/health", (req, res) => {
 
 app.use(authRoutes);
 app.use(pageRoute);
+app.use(openaiRoute);
 app.use("/api/stripe", stripeRoute);
 
 app.use(errorHandler);

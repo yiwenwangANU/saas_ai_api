@@ -105,7 +105,7 @@ export const googleAuthRedirect = (req, res) => {
       name: req.user.name,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "24h" }
   );
   const clientUrl = process.env.CLIENT_URL;
 

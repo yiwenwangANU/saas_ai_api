@@ -8,6 +8,7 @@ export const generateMealPlan = async (req, res, next) => {
   try {
     const { dietType, calories, allergies, prefer, snacks, days } = req.body;
     console.log(req.body);
+    return res.json({ mealPlan: false });
   } catch (err) {
     next(err);
   }
